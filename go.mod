@@ -1,4 +1,4 @@
-module kubectl-kopy
+module github.com/giorgosdi/kubectl-kopy
 
 go 1.17
 
