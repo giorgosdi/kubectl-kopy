@@ -59,7 +59,8 @@ func (s *Secret) Kopy() {
 	fmt.Println(result)
 }
 
-func (s *Secret) GetSecret(ns, secret string) *coreV1.Secret {
+func (s *Secret) GetResource(ns, secret string) {
 	result, _ := s.Client.CoreV1().Secrets(ns).Get(context.TODO(), secret, metav1.GetOptions{})
-	return result
+	s.O = *result
+	fmt.Println(result)
 }
