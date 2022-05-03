@@ -35,6 +35,7 @@ func removeAnnotations(annotations map[string]string) map[string]string {
 	delete(annotations, "hash")
 	delete(annotations, "fluxcd.io/sync-checksum")
 	delete(annotations, "helm.fluxcd.io/antecedent")
+	delete(annotations, "helm.sh/resource-policy")
 	return annotations
 }
 
@@ -49,18 +50,16 @@ func (s *Secret) RemoveGen() {
 	s.N = *secretKopy
 }
 
-func (s *Secret) Kopy() {
+func (s *Secret) Kopy(target string) {
 	s.RemoveGen()
-	result, err := s.Client.CoreV1().Secrets("default").Create(context.TODO(), &s.N, metav1.CreateOptions{})
+	_, err := s.Client.CoreV1().Secrets(target).Create(context.TODO(), &s.N, metav1.CreateOptions{})
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}
-	fmt.Println(result)
 }
 
 func (s *Secret) GetResource(ns, secret string) {
 	result, _ := s.Client.CoreV1().Secrets(ns).Get(context.TODO(), secret, metav1.GetOptions{})
 	s.O = *result
-	fmt.Println(result)
 }

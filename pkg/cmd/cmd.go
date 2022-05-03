@@ -7,6 +7,7 @@ import (
 	"github.com/giorgosdi/kubectl-kopy/pkg/kopy"
 	"github.com/giorgosdi/kubectl-kopy/pkg/options"
 	"github.com/spf13/cobra"
+	flag "github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
@@ -36,6 +37,7 @@ func NewKopyCommand(streams genericclioptions.IOStreams) *cobra.Command {
 			Kopy(cmd, o, args)
 		},
 	}
+	flag.StringP("target", "t", "", "Target namespace")
 	o.Config.AddFlags(cmd.Flags())
 
 	return cmd

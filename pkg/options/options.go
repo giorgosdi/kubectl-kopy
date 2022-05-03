@@ -14,6 +14,7 @@ type KopyOptions struct {
 	Config     *genericclioptions.ConfigFlags
 	Name       string
 	Kind       string
+	Target     string
 	Args       []string
 
 	genericclioptions.IOStreams
@@ -45,6 +46,7 @@ func (o *KopyOptions) Complete(c *cobra.Command, args []string) error {
 	if os.Getenv("KUBECONFIG") != "" {
 		o.Kubeconfig = os.Getenv("KUBECONFIG")
 	}
+	o.Target, _ = c.Flags().GetString("target")
 	o.Kind = args[0]
 	o.Name = args[1]
 	o.Args = args
