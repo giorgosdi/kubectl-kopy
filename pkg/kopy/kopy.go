@@ -1,28 +1,24 @@
 package kopy
 
 import (
+	"fmt"
+
 	"github.com/giorgosdi/kubectl-kopy/pkg/options"
 	"github.com/giorgosdi/kubectl-kopy/pkg/resource"
-	"github.com/giorgosdi/kubectl-kopy/pkg/secret"
-	"k8s.io/client-go/kubernetes"
 )
 
-type ResourceKind interface {
-	GetClientset(kind, kubeconfig string) *kubernetes.Clientset
-}
-
 type ResourceService struct {
-	kind ResourceKind
-}
-
-//NOTE: This is not really used
-type kopyResource interface {
-	Kopy(target string)
-	GetResource(ns, name string)
+	kind       string
+	kubeconfig string
 }
 
 type KopyResource struct {
 	resource kopyResource
+}
+
+type kopyResource interface {
+	Kopy(target string)
+	GetResource(ns, name string)
 }
 
 type kopyService struct {
@@ -30,16 +26,12 @@ type kopyService struct {
 	KS KopyResource
 }
 
-func (rS *ResourceService) GetClient(kind, kubeconfig string) *kubernetes.Clientset {
-	client := rS.kind.GetClientset(kind, kubeconfig)
-	return client
+func (rS *ResourceService) getClient() resource.Kind {
+	return resource.GetClientset(rS.kind, rS.kubeconfig)
 }
 
 func (kS *kopyService) RetrieveResource(name, kind, namespace, kubeconfig string) {
-	client := kS.RS.GetClient(kind, kubeconfig)
-	kS.KS.resource = &secret.Secret{
-		Client: *client,
-	}
+	kS.KS.resource = kS.RS.getClient()
 	kS.KS.resource.GetResource(namespace, name)
 }
 
@@ -52,8 +44,10 @@ func (kService *kopyService) GetResource(ns, name string) {
 }
 
 func KopyObject(o *options.KopyOptions) {
-	rs := ResourceService{}
-	rs.kind = &resource.Kind{}
+	rs := ResourceService{
+		kind:       o.Kind,
+		kubeconfig: o.Kubeconfig,
+	}
 	ks := KopyResource{}
 	kopyService := kopyService{
 		RS: rs,
@@ -61,5 +55,8 @@ func KopyObject(o *options.KopyOptions) {
 	}
 	kopyService.RetrieveResource(o.Name, o.Kind, o.Namespace, o.Kubeconfig)
 	kopyService.Kopy(o.Target)
+	fmt.Println()
+	fmt.Printf("%s %s was copied in %s namespace successfully", o.Name, o.Kind, o.Target)
+	fmt.Println()
 
 }

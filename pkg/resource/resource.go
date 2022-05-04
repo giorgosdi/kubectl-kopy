@@ -1,13 +1,16 @@
 package resource
 
 import (
+	"github.com/giorgosdi/kubectl-kopy/pkg/deployment"
+	"github.com/giorgosdi/kubectl-kopy/pkg/secret"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-type Kind struct {
+type Kind interface {
 	// NOTE: Kind is an interface so that resource.go does not need to know what is returning (Secret, Deployment etc)
-	Kind interface{}
+	Kopy(target string)
+	GetResource(ns, kind string)
 }
 
 func getClients(conf string) *kubernetes.Clientset {
@@ -17,7 +20,17 @@ func getClients(conf string) *kubernetes.Clientset {
 	return resourceClient
 }
 
-func (k *Kind) GetClientset(kind, kubeconfig string) *kubernetes.Clientset {
+func GetClientset(kind, kubeconfig string) Kind {
 	clientset := getClients(kubeconfig)
-	return clientset
+	if kind == "secret" {
+		return &secret.Secret{
+			Client: *clientset,
+		}
+	}
+	if kind == "deployment" {
+		return &deployment.Deployment{
+			Client: *clientset,
+		}
+	}
+	return nil
 }
