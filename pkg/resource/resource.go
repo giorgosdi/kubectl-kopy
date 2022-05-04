@@ -3,6 +3,7 @@ package resource
 import (
 	"github.com/giorgosdi/kubectl-kopy/pkg/deployment"
 	"github.com/giorgosdi/kubectl-kopy/pkg/secret"
+	"github.com/giorgosdi/kubectl-kopy/pkg/serviceaccount"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -29,6 +30,11 @@ func GetClientset(kind, kubeconfig string) Kind {
 	}
 	if kind == "deployment" {
 		return &deployment.Deployment{
+			Client: *clientset,
+		}
+	}
+	if kind == "sa" {
+		return &serviceaccount.ServiceAccount{
 			Client: *clientset,
 		}
 	}
