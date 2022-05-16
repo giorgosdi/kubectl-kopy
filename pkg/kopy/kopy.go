@@ -55,6 +55,7 @@ func KopyObject(o *options.KopyOptions) {
 	}
 	kopyService.RetrieveResource(o.Name, o.Kind, o.Namespace, o.Kubeconfig)
 	kopyService.Kopy(o.Target)
+	o.Kind = options.NormaliseKind(o.Kind)
 	fmt.Println()
 	fmt.Printf("%s %s was copied in %s namespace successfully", o.Name, o.Kind, o.Target)
 	fmt.Println()

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/slices"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
@@ -51,4 +52,17 @@ func (o *KopyOptions) Complete(c *cobra.Command, args []string) error {
 	o.Name = args[1]
 	o.Args = args
 	return nil
+}
+
+func NormaliseKind(kind string) string {
+	if slices.Contains([]string{"secrets", "secret"}, kind) {
+		return "Secret"
+	}
+	if slices.Contains([]string{"deployment", "deployments", "dep", "deploy"}, kind) {
+		return "Deployment"
+	}
+	if slices.Contains([]string{"serviceaccount", "serviceaccounts", "service-account", "service-accounts", "sa"}, kind) {
+		return "ServiceAccount"
+	}
+	return ""
 }
